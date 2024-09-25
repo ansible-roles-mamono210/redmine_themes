@@ -7,6 +7,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
+    index_var: idx
 
 - name: Install themes if directory is empty or does not exist
   ansible.builtin.git:
@@ -16,7 +17,9 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: theme_dir_content.results[loop.index0].files | length == 0
+    index_var: idx
+  when: theme_dir_content.results[idx].files | length == 0
+
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
