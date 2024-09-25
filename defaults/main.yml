@@ -1,0 +1,7 @@
+---
+# Redmine theme Git repositories
+redmine_themes:
+  - name: 'farend bleuclair'
+    repo: 'https://github.com/farend/redmine_theme_farend_bleuclair.git'
+    version: 'master'
+    install_dir: '/var/lib/redmine/public/themes/bleuclair'
