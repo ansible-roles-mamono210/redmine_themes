@@ -1,13 +1,14 @@
 ---
-- name: Check if theme directory exists
-  ansible.builtin.stat:
-    path: "{{ item.install_dir }}"
-  register: theme_dir_result
+- name: Check if theme directory exists and is not empty
+  ansible.builtin.find:
+    paths: "{{ item.install_dir }}"
+    file_type: any
+  register: theme_dir_content
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
 
-- name: Install themes if not already present
+- name: Install themes if directory is empty or does not exist
   ansible.builtin.git:
     repo: "{{ item.repo }}"
     dest: "{{ item.install_dir }}"
@@ -15,7 +16,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: not item.install_dir is in theme_dir_result.results | map(attribute='stat.exists') | list
+  when: theme_dir_content.matched == 0
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
