@@ -20,6 +20,17 @@
     index_var: idx
   when: theme_dir_content.results[idx].files | length == 0
 
+- name: Change owner and group of the theme directory
+  ansible.builtin.file:
+    path: "{{ item.install_dir }}"
+    state: directory
+    owner: '{{ redmine_dir_owner }}'
+    group: '{{ redmine_dir_group }}'
+    recurse: yes
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
+  when: theme_dir_content.results[idx].files | length == 0
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
