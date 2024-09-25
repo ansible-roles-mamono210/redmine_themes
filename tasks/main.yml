@@ -30,10 +30,14 @@
     insertafter: "^production:"
 
 - name: Clear Redmine cache
-  ansible.builtin.command:
-    cmd: bundle exec rake tmp:cache:clear
+  ansible.builtin.command: bundle exec rake tmp:cache:clear
+  args:
     chdir: '{{ redmine_dir }}'
-  changed_when: false
+  register: redmine_bundle_cache
+  changed_when: redmine_bundle_cache.stdout | length > 0
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
 
 - name: Restart Redmine
   ansible.builtin.command:
