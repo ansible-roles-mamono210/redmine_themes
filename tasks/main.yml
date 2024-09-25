@@ -39,8 +39,8 @@
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
     RAILS_ENV: production
 
-- name: Restart Redmine
-  ansible.builtin.command:
-    cmd: touch tmp/restart.txt
-    chdir: '{{ redmine_dir }}'
-  changed_when: false
+- name: Restart Apache (httpd) to apply Redmine changes
+  ansible.builtin.systemd:
+    name: httpd
+    state: restarted
+    enabled: yes
