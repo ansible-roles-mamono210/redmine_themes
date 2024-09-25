@@ -9,3 +9,21 @@
   when: not ansible.builtin.stat:
       path: "{{ item.install_dir }}"
       isdir: yes
+
+- name: Add ui_theme setting to configuration.yml
+  ansible.builtin.blockinfile:
+    path: "{{ redmine_dir }}/config/configuration.yml"
+    block: |
+      ui_theme: '{{ redmine_theme }}'
+    insertafter: "^production:"
+  become: yes
+
+- name: Clear Redmine cache
+  ansible.builtin.command:
+    cmd: bundle exec rake tmp:cache:clear
+    chdir: '{{ redmine_dir }}'
+
+- name: Restart Redmine
+  ansible.builtin.command:
+    cmd: touch tmp/restart.txt
+    chdir: '{{ redmine_dir }}'

@@ -5,3 +5,7 @@ redmine_themes:
     repo: 'https://github.com/farend/redmine_theme_farend_bleuclair.git'
     version: 'master'
     install_dir: '/var/lib/redmine/public/themes/bleuclair'
+
+redmine_dir: '/var/lib/redmine'
+
+redmine_theme: 'bleuclair'
