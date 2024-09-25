@@ -15,7 +15,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: not theme_dir_result.results[loop.index0].stat.exists
+  when: not item.install_dir is in theme_dir_result.results | map(attribute='stat.exists') | list
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
