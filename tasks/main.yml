@@ -2,18 +2,20 @@
 - name: Check if theme directory exists
   ansible.builtin.stat:
     path: "{{ item.install_dir }}"
-  register: theme_dir
-  with_items:
-    - "{{ redmine_themes }}"
+  register: theme_dir_result
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
 
 - name: Install themes if not already present
   ansible.builtin.git:
     repo: "{{ item.repo }}"
     dest: "{{ item.install_dir }}"
     version: "{{ item.version }}"
-  with_items:
-    - "{{ redmine_themes }}"
-  when: not theme_dir.results[ansible_loop.index0].stat.exists
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
+  when: not theme_dir_result.results[loop.index0].stat.exists
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
