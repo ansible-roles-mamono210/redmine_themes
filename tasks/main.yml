@@ -16,7 +16,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: theme_dir_content.matched == 0
+  when: theme_dir_content.results[loop.index0].files | length == 0
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
