@@ -6,3 +6,6 @@
     version: "{{ item.version }}"
   with_items:
     - "{{ redmine_themes }}"
+  when: not ansible.builtin.stat:
+      path: "{{ item.install_dir }}"
+      isdir: yes
