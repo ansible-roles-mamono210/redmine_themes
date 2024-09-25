@@ -13,7 +13,7 @@
     version: "{{ item.version }}"
   with_items:
     - "{{ redmine_themes }}"
-  when: not theme_dir.stat.exists
+  when: not theme_dir.results[ansible_loop.index0].stat.exists
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
