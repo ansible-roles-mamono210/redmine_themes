@@ -16,7 +16,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: theme_dir_content.results[loop.index0].files | length == 0
+  when: theme_dir_content.results[redmine_themes.index(item)].files | length == 0
 
 - name: Change owner and group of the theme directory
   ansible.builtin.file:
@@ -28,7 +28,7 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: theme_dir_content.results[loop.index0].files | length == 0
+  when: theme_dir_content.results[redmine_themes.index(item)].files | length == 0
 
 - name: Add ui_theme setting to configuration.yml
   become: yes
