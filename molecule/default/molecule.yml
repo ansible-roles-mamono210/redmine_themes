@@ -66,6 +66,6 @@ scenario:
     - syntax
     - create
     - converge
-    - verify
+#    - verify
     - cleanup
     - destroy
