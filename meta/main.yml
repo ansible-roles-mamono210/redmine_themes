@@ -1,0 +1,14 @@
+---
+dependencies: []
+galaxy_info:
+  author: mamono210
+  company: no name
+  description: Install Redmine themes.
+  galaxy_tags: []
+  license: "license (BSD, MIT)"
+  min_ansible_version: 10.0.1
+  role_name: redmine_themes
+  platforms:
+    - name: EL
+      release:
+        - 9

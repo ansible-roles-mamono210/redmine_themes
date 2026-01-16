@@ -1,0 +1,80 @@
+---
+- name: Install required packages for Redmine themes
+  ansible.builtin.package:
+    name:
+      - nodejs
+    state: present
+
+- name: Check if theme directory exists and is not empty
+  ansible.builtin.find:
+    paths: "{{ item.install_dir }}"
+    file_type: any
+  register: theme_dir_content
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
+
+- name: Install themes if directory is empty or does not exist
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.install_dir }}"
+    version: "{{ item.version }}"
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
+  when: theme_dir_content.results[redmine_themes.index(item)].files | length == 0
+
+- name: Change owner and group of the theme directory
+  ansible.builtin.file:
+    path: "{{ item.install_dir }}"
+    state: directory
+    owner: "{{ redmine_dir_owner }}"
+    group: "{{ redmine_dir_group }}"
+    recurse: yes
+  loop: "{{ redmine_themes }}"
+  loop_control:
+    loop_var: item
+  when: theme_dir_content.results[redmine_themes.index(item)].files | length == 0
+
+- name: Clear Redmine cache
+  ansible.builtin.command:
+    cmd: bundle exec rake tmp:cache:clear
+    chdir: '{{ redmine_dir }}'
+  register: redmine_bundle_cache
+  changed_when: redmine_bundle_cache.stdout | length > 0
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+
+- name: Delete pre-build assets
+  ansible.builtin.command:
+    cmd: bundle exec rake assets:clobber
+    chdir: '{{ redmine_dir }}'
+  changed_when: redmine_bundle_cache.stdout | length > 0
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+
+- name: Build redmine theme
+  ansible.builtin.command:
+    cmd: bundle exec rake assets:precompile
+    chdir: '{{ redmine_dir }}'
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+
+- name: Clear Redmine cache
+  ansible.builtin.command:
+    cmd: bundle exec rake tmp:cache:clear
+    chdir: '{{ redmine_dir }}'
+  register: redmine_bundle_cache
+  changed_when: redmine_bundle_cache.stdout | length > 0
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+
+- name: Restart Apache (httpd) to apply Redmine changes
+  ansible.builtin.systemd:
+    name: httpd
+    state: restarted
+    enabled: yes
