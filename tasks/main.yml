@@ -34,7 +34,6 @@
   loop: "{{ redmine_themes }}"
   loop_control:
     loop_var: item
-  when: theme_dir_content.results[redmine_themes.index(item)].files | length == 0
 
 - name: Clear Redmine cache
   ansible.builtin.command:
@@ -54,6 +53,7 @@
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
     RAILS_ENV: production
+    RAILS_RELATIVE_URL_ROOT: "{{ rails_relative_url_root }}"
 
 - name: Build redmine theme
   ansible.builtin.command:
@@ -62,6 +62,7 @@
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
     RAILS_ENV: production
+    RAILS_RELATIVE_URL_ROOT: "{{ rails_relative_url_root }}"
 
 - name: Clear Redmine cache
   ansible.builtin.command:
@@ -72,6 +73,14 @@
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
     RAILS_ENV: production
+
+- name: Change owner and groups of the assets directory
+  ansible.builtin.file:
+    path: "{{ redmine_dir }}/public/assets"
+    state: directory
+    owner: "{{ redmine_dir_owner }}"
+    group: "{{ redmine_dir_group }}"
+    recurse: yes
 
 - name: Restart Apache (httpd) to apply Redmine changes
   ansible.builtin.systemd:
